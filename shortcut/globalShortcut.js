@@ -3,7 +3,6 @@ const settings = require('electron-settings');
 
 module.exports = {
   registerShortcut: (savedShortcut, toggleWindow) => {
-    // Register a 'CommandOrControl+X' shortcut listener.
     const ret = globalShortcut.register(savedShortcut, () => {
       toggleWindow();
     })
@@ -18,10 +17,7 @@ module.exports = {
   },
 
   unregisterShortcut: savedShortcutKey => {
-    // Unregister a shortcut.
     globalShortcut.unregister(savedShortcutKey)
-
-    // Unregister all shortcuts.
     globalShortcut.unregisterAll()
   },
 
@@ -31,16 +27,14 @@ module.exports = {
 
   saveShortcut: function (shortcutToSave, toggleWindow) {
     settings.set('openAppShortcut', { shortcutKey: shortcutToSave, });
-    this.unregisterShortcut(this.getSavedShortcut()) // uregister old shortcut
-    return this.registerShortcut(shortcutToSave, toggleWindow) // register new shortcut
+    this.unregisterShortcut(this.getSavedShortcut());
+    return this.registerShortcut(shortcutToSave, toggleWindow);
   },
 
   saveShortcutForFirstTime: () => {
-    // if no shortcut has been saved, save default shortcut key
     const defaultShortcutKey = 'Command+u';
 
     if (!settings.get('openAppShortcut.shortcutKey')) {
-      console.log('no setting found',)
       settings.set('openAppShortcut', {
         shortcutKey: defaultShortcutKey,
       });
