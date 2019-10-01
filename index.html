@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      color: #464545;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      overflow-y: hidden;
+    }
+
+    .webview {
+      min-width: 700px;
+      height: calc(100vh - 30px);
+    }
+
+    .optionsParentHidden {
+      transition: 0.5s;
+      background-color: #EDEDED;
+      height: 30px;
+      font-family: sans-serif;
+    }
+
+    .optionsParentExpanded {
+      transition: 0.3s;
+      background-color: #EDEDED;
+      height: 200px;
+      border-bottom: 1px solid #d8d8d8;
+      font-family: sans-serif;
+    }
+
+    #title {
+      color: #464545;
+      padding: 7px;
+      font-size: 14px;
+    }
+
+    .topBarIcon {
+      font-size: 14px;
+      color: #464545;
+      border-radius: 3px;
+      border-color: #c3c3c3;
+      border-style: solid;
+      border-width: 1px;
+      cursor: pointer;
+      margin: 3px;
+      padding: 3px 8px 3px 8px;
+      position: absolute;
+      top: 0;
+    }
+
+    .topBarIcon:hover {
+      background: #dedede;
+    }
+
+    .topBarIcon:active {
+      background: #bababa;
+    }
+
+
+    #optionsIcon {
+      color: #464545;
+      font-size: 14px;
+      right: 150px;
+    }
+
+    #about {
+      color: #464545;
+      font-size: 14px;
+      right: 90px;
+    }
+
+    #closeIcon {
+      color: #464545;
+      font-size: 14px;
+      right: 0;
+    }
+
+    #shortcutInput, #inputRegisterOptions {
+      width: 200px;
+    }
+
+    .options{
+      padding: 8px;
+    }
+
+    #signout {
+      color: #464545;
+      width: 163px;
+    }
+
+    #titleBar {
+      border-bottom: 1px solid #d8d8d8;
+    }
+
+    #optionsBody {
+      display: block;
+    }
+
+    #optionsBodyHidden {
+      display: none;
+    }
+
+    .optionsTitle{
+      margin: 7px 0 7px 0;
+    }
+
+    #license{
+      background-color: #252526;
+      font-family: sans-serif;
+      color: #EDEDED;
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+    }
+
+    #licenseTitle{
+      padding-top: 50px;
+      margin: auto;
+      width: 50%;
+      color: #ffffff;
+      padding-bottom: 10px;
+      text-align: center;
+    }
+
+    #licenseDescription{
+      margin: auto;
+      width: 70%;
+      color: rgb(241, 241, 241);
+      padding-bottom: 15px;
+      text-align: center;
+    }
+
+    #licenseBuy{
+      width: 30%;
+      height: 40px;
+      margin: auto;
+      text-align: center;
+    }
+
+    #register{
+      padding-top: 15px;
+      width: 30%;
+      margin: auto;
+      text-align: center;
+    }
+
+    #inputRegister{
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+
+    #buyButton:link, #buyButton:visited {
+      background-color: #f44336;
+      color: white;
+      padding: 14px 25px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    #buyButton:hover, #buyButton:active {
+      background-color: red;
+    }
+
+    #licenseRegisterResult{
+      padding-top: 10px;
+      font-weight: 500;
+      font-size: 16px;
+      margin: auto;
+      width: 90%;
+      color: rgb(241, 241, 241);
+      padding-bottom: 15px;
+      text-align: center;
+    }
+
+    #saveShortcut, #registerButtonOptions{
+      width: 80px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="optionsParent" class="optionsParentHidden">
+  <div id="titleBar">
+    <div id="title">Voice Notifies &nbsp;<button onclick="refresh()">&#x21bb; Refresh</button>
+    </div>
+    <div class="topBarIcon" id="optionsIcon" onclick="toggle()">Options</div>
+    <div class="topBarIcon" id="closeIcon" onclick="quit()">Quit</div>
+    <div class="topBarIcon" id="about" onclick="openAbout()">About</div>
+  </div>
+</div>
+<webview class='webview' src="https://voice.google.com/" preload="./injector.js"></webview>
+
+<script>
+  let pollingVariable;
+  const { ipcRenderer } = require('electron');
+  require('./renderer')
+  const shortcut = require('./shortcut/globalShortcut')
+
+  const message = document.getElementById('message');
+  const shortcutInput = document.getElementById('shortcutInput');
+  const saveShortcut = document.getElementById('saveShortcut');
+  const webview = document.querySelector('webview')
+
+  shortcutInput.value = shortcut.getSavedShortcut()
+
+  function toggle() {
+    const currentClass = document.getElementById('optionsParent').className;
+
+    if (currentClass === 'optionsParentHidden') {
+      document.getElementById('optionsParent').className = 'optionsParentExpanded';
+      document.getElementById('optionsBodyHidden').id = 'optionsBody';
+    } else {
+      document.getElementById('optionsParent').className = 'optionsParentHidden';
+      document.getElementById('optionsBody').id = 'optionsBodyHidden';
+    }
+
+    shortcutInput.select()
+  }
+
+  function quit() {
+    ipcRenderer.sendSync('quitApp')
+  }
+
+  function openAbout() {
+    const openAboutWindow = require('about-window').default;
+    const join = require('path').join;
+
+    openAboutWindow({
+      icon_path: join(__dirname, '/assets/voiceNotifier.png'),
+      copyright: 'Copyright (c) 2018 www.voicenotifies.com',
+      package_json_dir: join(__dirname, '../../')
+    })
+  }
+
+  function signOut() {
+    const hasSignedOut = ipcRenderer.sendSync('signOut')
+
+    if (hasSignedOut) {
+      message.innerHTML = 'You have successfully signed out';
+      window.location.reload() // take them to the home page
+    }
+
+    console.log('hasSignedOut', hasSignedOut)
+  }
+
+  function refresh() {
+    window.location.reload()
+  }
+
+  webview.addEventListener('dom-ready', () => {
+    if (!pollingVariable) {
+      pollingVariable = setInterval(() => webview.send('request'), 1000) // poll every 1 seconds
+    }
+  });
+
+  // Process the data from the webview
+  webview.addEventListener('ipc-message', event => {
+    ipcRenderer.send('unread-count-update', event.channel)
+  });
+
+  // keyboard to electron shortcut symbol association,
+  // only put shortcuts that don't have one to one mapping between
+  // event.key <---> electron accelerator symbols
+  const shortCutSymbols = {
+    'Meta': 'CommandOrControl',
+    'ArrowUp': 'Up',
+    'ArrowRight': 'Right',
+    'ArrowDown': 'Down',
+    'ArrowLeft': 'Left',
+  }
+
+  shortcutInput.addEventListener('keydown', event => {
+    if (event.key === 'Backspace') return // to allow deletes
+
+    event.preventDefault();
+
+    // get proper shortcut symbol for electron
+    let properShortcut;
+    if (shortCutSymbols[event.key]) {
+      properShortcut = shortCutSymbols[event.key];
+    } else {
+      properShortcut = event.key;
+    }
+
+    if (!shortcutInput.value) { // if the first keypress
+      shortcutInput.value += `${properShortcut}`
+    } else { // for subsequent key presses
+      shortcutInput.value += ` + ${properShortcut}`
+    }
+  })
+
+  saveShortcut.addEventListener('click', event => {
+    const electronFormatShortcut = shortcutInput.value.replace(/\s/g, '');
+    const isShortcutSaved = ipcRenderer.sendSync('shortcutSave', electronFormatShortcut)
+
+    if (isShortcutSaved) {
+      message.innerHTML = 'shortcut saved'
+    } else {
+      message.innerHTML = 'sorry shortcut not supported'
+    }
+  })
+
+</script>
+</body>
+</html>

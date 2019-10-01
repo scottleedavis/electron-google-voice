@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Notifies Update Available</title>
+</head>
+<body>
+<div>Downloading an update...</div>
+<div id="messages"></div>
+<script>
+  // Display the current version
+  let version = window.location.hash.substring(1);
+  document.getElementById('version').innerText = version;
+  // Listen for messages
+  const {ipcRenderer} = require('electron');
+  var message = document.createElement('div');
+
+  ipcRenderer.on('message', function(event, text) {
+    var container = document.getElementById('messages');
+
+    message.innerHTML = text;
+    container.appendChild(message);
+  })
+</script>
+</body>
+</html>

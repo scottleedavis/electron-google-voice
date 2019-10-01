@@ -1,0 +1,36 @@
+{
+  "name": "electron-google-voice",
+  "version": "1.0.0",
+  "description": "google voice electron app",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scottleedavis/electron-google-voice.git"
+  },
+  "keywords": [
+    "electron",
+    "google",
+    "voice"
+  ],
+  "author": "scott lee davis",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/scottleedavis/electron-google-voice/issues"
+  },
+  "homepage": "https://github.com/scottleedavis/electron-google-voice#readme",
+  "devDependencies": {
+    "electron": "^6.0.10"
+  },
+  "dependencies": {
+    "about-window": "^1.13.1",
+    "axios": "^0.19.0",
+    "electron-editor-context-menu": "^1.1.1",
+    "electron-log": "^3.0.8",
+    "electron-settings": "^3.2.0",
+    "electron-updater": "^4.1.2",
+    "node-machine-id": "^1.1.12"
+  }
+}
